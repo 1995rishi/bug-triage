@@ -5,6 +5,8 @@ from gensim.models import Word2Vec
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn import svm
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.multiclass import OneVsRestClassifier
 np.random.seed(1337)
 
 def preprocess(s):
@@ -45,7 +47,7 @@ word2vec_model = Word2Vec(data_tokens, min_count = 5, size = 200, window = 5)
 vocabulary = word2vec_model.wv.vocab
 
 total = len(data_developer)
-train_length = int(0.7*total)
+train_length = int(0.8*total)
 data_developer_train = data_developer[0:train_length+1]
 data_tokens_train = data_tokens[0:train_length+1]
 data_developer_test = data_developer[train_length:total]
@@ -59,13 +61,13 @@ final_test_data = []
 final_test_owner = []
 for j, item in enumerate(data_tokens_train):
 	current_train_filter = [word for word in item if word in vocabulary]
-	if len(current_train_filter)>=10:  
+	if len(current_train_filter)>=20:  
 	  updated_train_data.append(current_train_filter)
 	  updated_train_owner.append(data_developer_train[j])  
 	  
 for j, item in enumerate(data_tokens_test):
 	current_test_filter = [word for word in item if word in vocabulary]  
-	if len(current_test_filter)>=10:
+	if len(current_test_filter)>=20:
 	  final_test_data.append(current_test_filter)    	  
 	  final_test_owner.append(data_developer_test[j])    	  
 
@@ -112,15 +114,41 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 ################################################################ SVM ########################################################
 print "Starting SVM ....."
-classifierModel = svm.SVC(probability=True, verbose=False, decision_function_shape='ovr', random_state=42)
+classifierModel = svm.SVC(probability=True, verbose=False, decision_function_shape='ovr')
 classifierModel.fit(train_feats, updated_train_owner)
 predict = classifierModel.predict(test_feats)
+predict_prob = classifierModel.predict_proba(test_feats)
 classes = classifierModel.classes_ 
-print predict
-# print(updated_train_owner.count("jon@chromium.org"))
-# print updated_test_owner
+# print predict
+
+match = 0
+for i in range(len(predict_prob)):
+	expected = updated_train_owner[i]
+	for j in range(len(classes)):
+		if predict_prob[i][j]<mx:
+			mx = predict_prob[i][j]
+			mi = j
+	if classes[mi] == updated_train_owner[i]:
+		match += 1
+print "accuracy = ", float(match)/float(len(predict))*100
+
 match = 0
 for i in range(len(predict)):
 	if predict[i] == updated_test_owner[i]:
 		match += 1
 print "accuracy = ", float(match)/float(len(predict))*100
+
+
+##############################################################  Naive Bayes #################################################
+'''print "Starting Naive Bayes....."
+classifierModel = MultinomialNB(alpha=0.01)        
+classifierModel = OneVsRestClassifier(classifierModel).fit(train_feats, updated_train_owner)
+predict = classifierModel.predict_proba(test_feats)  
+classes = classifierModel.classes_
+match = 0
+print predict
+for i in range(len(predict)):
+	if predict[i] == updated_test_owner[i]:
+		match += 1
+print "accuracy = ", float(match)/float(len(predict))*100'''
+
