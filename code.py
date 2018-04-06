@@ -7,8 +7,10 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn import svm
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.multiclass import OneVsRestClassifier
+from nltk.corpus import stopwords
 np.random.seed(1337)
 
+stop_words = stopwords.words('english')
 def preprocess(s):
 	s = s.replace('\r', ' ')
 	s = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', s)
@@ -19,6 +21,7 @@ def preprocess(s):
 	s = s.lower()
 	s = nltk.word_tokenize(s)
 	s = [word.strip(string.punctuation) for word in s]
+	s = [item.lower() for item in s if item.lower() not in stop_words]
 	return s
 
 
@@ -32,7 +35,7 @@ with open('train.csv','r') as training_file:
 	row_count = 0
 	try:
 		for row in trainCSV:
-			if row_count >= 1000:
+			if row_count >= 20000:
 				break
 			if row_count != 0:
 				data = preprocess(row[1]) + preprocess(row[2])
@@ -113,7 +116,7 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 
 ################################################################ SVM ########################################################
-print "Starting SVM ....."
+'''print "Starting SVM ....."
 classifierModel = svm.SVC(probability=True, verbose=False, decision_function_shape='ovr')
 classifierModel.fit(train_feats, updated_train_owner)
 predict = classifierModel.predict(test_feats)
@@ -122,33 +125,49 @@ classes = classifierModel.classes_
 # print predict
 
 match = 0
-for i in range(len(predict_prob)):
-	expected = updated_train_owner[i]
-	for j in range(len(classes)):
-		if predict_prob[i][j]<mx:
-			mx = predict_prob[i][j]
-			mi = j
-	if classes[mi] == updated_train_owner[i]:
-		match += 1
+for j,prob in enumerate(predict_prob):
+	expected = updated_train_owner[j]
+	prob = [ [i,prob[i]] for i in range(len(prob))]
+	prob = sorted(prob, reverse = True, key = lambda x: x[1])
+	for i in range(10):
+		c = prob[i][0]
+		if classes[c]==expected:
+			match+=1
+			break
 print "accuracy = ", float(match)/float(len(predict))*100
 
 match = 0
 for i in range(len(predict)):
 	if predict[i] == updated_test_owner[i]:
 		match += 1
-print "accuracy = ", float(match)/float(len(predict))*100
+print "accuracy = ", float(match)/float(len(predict))*100'''
 
 
 ##############################################################  Naive Bayes #################################################
-'''print "Starting Naive Bayes....."
+print "Starting Naive Bayes....."
 classifierModel = MultinomialNB(alpha=0.01)        
 classifierModel = OneVsRestClassifier(classifierModel).fit(train_feats, updated_train_owner)
 predict = classifierModel.predict_proba(test_feats)  
 classes = classifierModel.classes_
 match = 0
 print predict
-for i in range(len(predict)):
-	if predict[i] == updated_test_owner[i]:
-		match += 1
-print "accuracy = ", float(match)/float(len(predict))*100'''
+threshold = (1.0/len(classes))*3
+match1 = 0
+for j,prob in enumerate(predict):
+	expected = updated_test_owner[j]
+	#for i in range(prob[j]):
+		#if 
+
+	prob = [ [i,prob[i]] for i in range(len(prob))]
+	prob = sorted(prob, reverse = True, key = lambda x: x[1])
+	for i in range(10):
+		c = prob[i][0]
+		if classes[c]==expected:
+			match+=1
+			break
+print "accuracy = ", float(match)/float(len(predict))*100
+# for i in range(len(predict)):
+# 	if predict[i] == updated_test_owner[i]:
+# 		match += 1
+# print "accuracy = ", float(match)/float(len(predict))*100
 
