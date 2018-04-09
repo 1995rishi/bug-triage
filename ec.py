@@ -31,7 +31,7 @@ def preprocess(s):
 data_tokens = []
 data_developer = []
 
-with open('train.csv','r') as training_file:
+with open('ecllipse.csv','r') as training_file:
 	# reader = csv.reader(x.replace('\0', '') for x in mycsv)
 	trainCSV = csv.reader(x.replace('\0','') for x in training_file)
 	row_count = 0
@@ -40,10 +40,10 @@ with open('train.csv','r') as training_file:
 			if row_count >= 20000:
 				break
 			if row_count != 0:
-				data = preprocess(row[1]) + preprocess(row[2])
+				data = preprocess(row[6]) + preprocess(row[22])
 				data = filter(None, data)
 				data_tokens.append(data)
-				data_developer.append(row[0])
+				data_developer.append(row[3])
 			row_count += 1
 	except:
 		print(row_count)
@@ -145,12 +145,13 @@ classifierModel = MultinomialNB(alpha=0.01)
 classifierModel = OneVsRestClassifier(classifierModel).fit(train_feats, updated_train_owner)
 predict = classifierModel.predict_proba(test_feats)
 classes = classifierModel.classes_
+print(len(classes))
 match = 0
 for j,prob in enumerate(predict):
 	expected = updated_test_owner[j]
 	prob = [ [i,prob[i]] for i in range(len(prob))]
 	prob = sorted(prob, reverse = True, key = lambda x: x[1])
-	for i in range(10):
+	for i in range(60):
 		c = prob[i][0]
 		if classes[c]==expected:
 			match+=1
