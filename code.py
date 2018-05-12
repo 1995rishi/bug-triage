@@ -7,10 +7,12 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn import svm
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.linear_model import SGDClassifier
 from nltk.corpus import stopwords
 #import tensorflow as tf
 
 # np.random.seed(1337)
+
 
 stop_words = stopwords.words('english')
 def preprocess(s):
@@ -37,8 +39,8 @@ with open('train.csv','r') as training_file:
 	row_count = 0
 	try:
 		for row in trainCSV:
-			if row_count >= 20000:
-				break
+			# if row_count >= 5000:
+			# 	break
 			if row_count != 0:
 				data = preprocess(row[1]) + preprocess(row[2])
 				data = filter(None, data)
@@ -52,7 +54,7 @@ word2vec_model = Word2Vec(data_tokens, min_count = 5, size = 200, window = 5)
 vocabulary = word2vec_model.wv.vocab
 
 total = len(data_developer)
-train_length = int(0.8*total)
+train_length = int(0.75*total)
 data_developer_train = data_developer[0:train_length+1]
 data_tokens_train = data_tokens[0:train_length+1]
 data_developer_test = data_developer[train_length:total]
@@ -100,7 +102,7 @@ vocab_data = []
 for item in vocabulary:
 	  vocab_data.append(item)
 
-# print len(test_data)
+# print len(set(train_owner_unique))
 
 # Extract tf based bag of words representation
 tfidf_transformer = TfidfTransformer(use_idf=True,sublinear_tf=True)
@@ -108,7 +110,7 @@ count_vect = CountVectorizer(min_df=5, vocabulary= vocab_data,dtype=np.int32)
 
 train_counts = count_vect.fit_transform(train_data)       
 train_feats = tfidf_transformer.fit_transform(train_counts)
-#print train_feats.shape
+# print train_feats.shape
 
 test_counts = count_vect.transform(test_data)
 test_feats = tfidf_transformer.transform(test_counts)
@@ -118,24 +120,25 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 
 ################################################################ SVM ########################################################
-'''print "Starting SVM ....."
+print "Starting SVM ....."
 classifierModel = svm.SVC(probability=True, verbose=False, decision_function_shape='ovr')
 classifierModel.fit(train_feats, updated_train_owner)
 predict_prob = classifierModel.predict_proba(test_feats)
 classes = classifierModel.classes_ 
 # print predict
-
+print "classes = ",len(classes)
+k=int(0.05*len(classes))
 match = 0
 for j,prob in enumerate(predict_prob):
 	expected = updated_test_owner[j]
 	prob = [ [i,prob[i]] for i in range(len(prob))]
 	prob = sorted(prob, reverse = True, key = lambda x: x[1])
-	for i in range(10):
+	for i in range(k):
 		c = prob[i][0]
 		if classes[c]==expected:
 			match+=1
 			break
-print "accuracy = ", float(match)/float(len(predict_prob))*100'''
+print "accuracy = ", float(match)/float(len(predict_prob))*100
 
 
 
@@ -145,15 +148,39 @@ classifierModel = MultinomialNB(alpha=0.01)
 classifierModel = OneVsRestClassifier(classifierModel).fit(train_feats, updated_train_owner)
 predict = classifierModel.predict_proba(test_feats)
 classes = classifierModel.classes_
+print "classes = ",len(classes)
+k=int(0.05*len(classes))
 match = 0
 for j,prob in enumerate(predict):
 	expected = updated_test_owner[j]
 	prob = [ [i,prob[i]] for i in range(len(prob))]
 	prob = sorted(prob, reverse = True, key = lambda x: x[1])
-	for i in range(10):
+	
+	for i in range(k):
 		c = prob[i][0]
 		if classes[c]==expected:
 			match+=1
 			break
 print "accuracy = ", float(match)/float(len(predict))*100
 
+
+#############################################################  SGD Classification ###########################################
+print "Starting SGD....."
+classifierModel = SGDClassifier(loss='log', alpha=0.01)
+classifierModel.fit(train_feats, updated_train_owner)
+predict_prob = classifierModel.predict_proba(test_feats)
+classes = classifierModel.classes_ 
+# print predict
+print "classes = ",len(classes)
+k=int(0.05*len(classes))
+match = 0
+for j,prob in enumerate(predict_prob):
+	expected = updated_test_owner[j]
+	prob = [ [i,prob[i]] for i in range(len(prob))]
+	prob = sorted(prob, reverse = True, key = lambda x: x[1])
+	for i in range(k):
+		c = prob[i][0]
+		if classes[c]==expected:
+			match+=1
+			break
+print "accuracy = ", float(match)/float(len(predict_prob))*100
