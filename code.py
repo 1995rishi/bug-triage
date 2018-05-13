@@ -105,7 +105,7 @@ for item in vocabulary:
 # print len(set(train_owner_unique))
 
 # Extract tf based bag of words representation
-tfidf_transformer = TfidfTransformer(use_idf=True,sublinear_tf=True)
+tfidf_transformer = TfidfTransformer(use_idf=False,sublinear_tf=True)
 count_vect = CountVectorizer(min_df=5, vocabulary= vocab_data,dtype=np.int32)
 
 train_counts = count_vect.fit_transform(train_data)       
