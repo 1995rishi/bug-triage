@@ -39,7 +39,6 @@ with open('train.csv','r') as training_file:
 	row_count = 0
 	try:
 		for row in trainCSV:
-			print row[0]
 			if row_count >= 5000:
 				break
 			if row_count != 0:
