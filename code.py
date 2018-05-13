@@ -123,25 +123,25 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 
 ################################################################ SVM ########################################################
-# print "Starting SVM ....."
-# classifierModel = svm.SVC(probability=True, verbose=False, decision_function_shape='ovr')
-# classifierModel.fit(train_feats, updated_train_owner)
-# predict_prob = classifierModel.predict_proba(test_feats)
-# classes = classifierModel.classes_ 
-# # print predict
-# print "classes = ",len(classes)
-# k=int(0.05*len(classes))
-# match = 0
-# for j,prob in enumerate(predict_prob):
-# 	expected = updated_test_owner[j]
-# 	prob = [ [i,prob[i]] for i in range(len(prob))]
-# 	prob = sorted(prob, reverse = True, key = lambda x: x[1])
-# 	for i in range(k):
-# 		c = prob[i][0]
-# 		if classes[c]==expected:
-# 			match+=1
-# 			break
-# print "accuracy = ", float(match)/float(len(predict_prob))*100
+print "Starting SVM ....."
+classifierModel = svm.SVC(probability=True, verbose=False, decision_function_shape='ovr')
+classifierModel.fit(train_feats, updated_train_owner)
+predict_prob = classifierModel.predict_proba(test_feats)
+classes = classifierModel.classes_ 
+# print predict
+print "classes = ",len(classes)
+k=int(0.05*len(classes))
+match = 0
+for j,prob in enumerate(predict_prob):
+	expected = updated_test_owner[j]
+	prob = [ [i,prob[i]] for i in range(len(prob))]
+	prob = sorted(prob, reverse = True, key = lambda x: x[1])
+	for i in range(k):
+		c = prob[i][0]
+		if classes[c]==expected:
+			match+=1
+			break
+print "accuracy = ", float(match)/float(len(predict_prob))*100
 
 
 
@@ -168,25 +168,25 @@ print "accuracy = ", float(match)/float(len(predict))*100
 
 
 #############################################################  SGD Classification ###########################################
-# print "Starting SGD....."
-# classifierModel = SGDClassifier(loss='log', alpha=0.01)
-# classifierModel.fit(train_feats, updated_train_owner)
-# predict_prob = classifierModel.predict_proba(test_feats)
-# classes = classifierModel.classes_ 
-# # print predict
-# print "classes = ",len(classes)
-# k=int(0.05*len(classes))
-# match = 0
-# for j,prob in enumerate(predict_prob):
-# 	expected = updated_test_owner[j]
-# 	prob = [ [i,prob[i]] for i in range(len(prob))]
-# 	prob = sorted(prob, reverse = True, key = lambda x: x[1])
-# 	for i in range(k):
-# 		c = prob[i][0]
-# 		if classes[c]==expected:
-# 			match+=1
-# 			break
-# print "accuracy = ", float(match)/float(len(predict_prob))*100
+print "Starting SGD....."
+classifierModel = SGDClassifier(loss='log', alpha=0.01)
+classifierModel.fit(train_feats, updated_train_owner)
+predict_prob = classifierModel.predict_proba(test_feats)
+classes = classifierModel.classes_ 
+# print predict
+print "classes = ",len(classes)
+k=int(0.05*len(classes))
+match = 0
+for j,prob in enumerate(predict_prob):
+	expected = updated_test_owner[j]
+	prob = [ [i,prob[i]] for i in range(len(prob))]
+	prob = sorted(prob, reverse = True, key = lambda x: x[1])
+	for i in range(k):
+		c = prob[i][0]
+		if classes[c]==expected:
+			match+=1
+			break
+print "accuracy = ", float(match)/float(len(predict_prob))*100
 
 
 ############################################################   MeanShift Clustering #########################################
@@ -219,28 +219,28 @@ print "accuracy = ", float(match)/float(len(predict))*100
 
 
 #############################################################  Kmeans clustering  ############################################
-# print "Starting Kmeans Clustering...."
-# kmeans = KMeans(n_clusters=200, random_state=0).fit(train_feats)
-# labels = kmeans.labels_
-# predict = kmeans.predict(test_feats)
-# cluster_devs = {}
-# for i in range(len(labels)):
-# 	try:
-# 		cluster_devs[labels[i]].append(updated_train_owner[i])
-# 	except:
-# 		cluster_devs[labels[i]] = [updated_train_owner[i]]
+print "Starting Kmeans Clustering...."
+kmeans = KMeans(n_clusters=150, random_state=0).fit(train_feats)
+labels = kmeans.labels_
+predict = kmeans.predict(test_feats)
+cluster_devs = {}
+for i in range(len(labels)):
+	try:
+		cluster_devs[labels[i]].append(updated_train_owner[i])
+	except:
+		cluster_devs[labels[i]] = [updated_train_owner[i]]
 
 
-# match = 0
-# print(max(labels))
-# for i in range(max(labels)):
-# 	print len(set(cluster_devs[i]))
-# for i, label in enumerate(predict):
-# 	expected = updated_test_owner[i]
-# 	if expected in cluster_devs[label]:
-# 		match += 1
+match = 0
+print(max(labels))
+for i in range(max(labels)):
+	print len(set(cluster_devs[i]))
+for i, label in enumerate(predict):
+	expected = updated_test_owner[i]
+	if expected in cluster_devs[label]:
+		match += 1
 
-# print "accuracy = ", float(match)/float(len(predict))*100
+print "accuracy = ", float(match)/float(len(predict))*100
 
 ###########################################################   AgglomerativeClustering ########################################
 # print "Starting Agglomerative Clustering...."
