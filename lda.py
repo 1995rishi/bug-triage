@@ -109,7 +109,7 @@ for item in vocabulary:
 # print len(set(train_owner_unique))
 
 # lda model
-lda = LatentDirichletAllocation(n_components=150)
+lda = LatentDirichletAllocation(n_components=100)
 count_vect = CountVectorizer(min_df=5, vocabulary= vocab_data,dtype=np.int32)
 
 train_counts = count_vect.fit_transform(train_data)       
