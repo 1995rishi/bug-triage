@@ -10,7 +10,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import SGDClassifier
 from nltk.corpus import stopwords
 
-from sklearn.cluster import MeanShift, estimate_bandwidth, DBSCAN
+from sklearn.cluster import MeanShift, estimate_bandwidth, DBSCAN, KMeans
 
 #import tensorflow as tf
 
@@ -42,7 +42,7 @@ with open('train.csv','r') as training_file:
 	row_count = 0
 	try:
 		for row in trainCSV:
-			if row_count >= 5000:
+			if row_count >= 20000:
 				break
 			if row_count != 0:
 				data = preprocess(row[1]) + preprocess(row[2])
@@ -108,7 +108,7 @@ for item in vocabulary:
 # print len(set(train_owner_unique))
 
 # Extract tf based bag of words representation
-tfidf_transformer = TfidfTransformer(use_idf=False,sublinear_tf=True)
+tfidf_transformer = TfidfTransformer(use_idf=True,sublinear_tf=True)
 count_vect = CountVectorizer(min_df=5, vocabulary= vocab_data,dtype=np.int32)
 
 train_counts = count_vect.fit_transform(train_data)       
@@ -190,19 +190,46 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 
 ############################################################   MeanShift Clustering #########################################
-print "Starting Meanshift Clustering...."
-bandwidth = estimate_bandwidth(train_feats.toarray(), quantile=0.2, n_samples=500)
-print "estimated bandwidth = ", bandwidth
-ms = MeanShift(bandwidth=bandwidth)
-ms = ms.fit(train_feats.toarray())
-predict = ms.predict(test_feats)
-labels = ms.labels_
+# print "Starting Meanshift Clustering...."
+# bandwidth = estimate_bandwidth(train_feats.toarray(), quantile=0.2, n_samples=500)
+# print "estimated bandwidth = ", bandwidth
+# ms = MeanShift(bandwidth=bandwidth)
+# ms = ms.fit(train_feats.toarray())
+# predict = ms.predict(test_feats)
+# labels = ms.labels_
+# cluster_devs = {}
+# for i in range(len(labels)):
+# 	try:
+# 		cluster_devs[labels[i]].append(updated_train_owner[i])
+# 	except:
+# 		cluster_devs[labels[i]] = [updated_train_owner[i]]
+
+# match = 0
+# print(max(labels))
+# for i in range(max(labels)):
+# 	print len(set(cluster_devs[i]))
+# for i, label in enumerate(predict):
+# 	expected = updated_test_owner[i]
+# 	if expected in cluster_devs[label]:
+# 		match += 1
+
+# print "accuracy = ", float(match)/float(len(predict))*100
+# cluster_centers = ms.cluster_centers_
+# print len(cluster_centers)
+
+
+#############################################################  Kmeans clustering  ############################################
+print "Starting Kmeans Clustering...."
+kmeans = KMeans(n_clusters=100, random_state=0).fit(train_feats)
+labels = kmeans.labels_
+predict = kmeans.predict(test_feats)
 cluster_devs = {}
 for i in range(len(labels)):
 	try:
 		cluster_devs[labels[i]].append(updated_train_owner[i])
 	except:
 		cluster_devs[labels[i]] = [updated_train_owner[i]]
+
 
 match = 0
 print(max(labels))
@@ -214,8 +241,3 @@ for i, label in enumerate(predict):
 		match += 1
 
 print "accuracy = ", float(match)/float(len(predict))*100
-cluster_centers = ms.cluster_centers_
-print len(cluster_centers)
-
-
-#############################################################  Dbscan clustering  ############################################
