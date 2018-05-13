@@ -50,6 +50,8 @@ with open('train.csv','r') as training_file:
 	except:
 		print(row_count)
 
+print "hello", data_tokens[0]
+
 word2vec_model = Word2Vec(data_tokens, min_count = 5, size = 200, window = 5)
 vocabulary = word2vec_model.wv.vocab
 
