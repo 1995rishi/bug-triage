@@ -244,9 +244,9 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 ###########################################################   AgglomerativeClustering ########################################
 print "Starting Agglomerative Clustering...."
-kmeans = AgglomerativeClustering(n_clusters=150).fit(train_feats)
+kmeans = AgglomerativeClustering(n_clusters=150).fit(train_feats.toarray())
 labels = kmeans.labels_
-predict = kmeans.fit_predict(train_feats, test_feats)
+predict = kmeans.fit_predict(train_feats.toarray(), test_feats.toarray())
 cluster_devs = {}
 for i in range(len(labels)):
 	try:
