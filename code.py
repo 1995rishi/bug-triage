@@ -265,4 +265,3 @@ for i, label in enumerate(predict):
 		match += 1
 
 print "accuracy = ", float(match)/float(len(predict))*100
-
