@@ -71,13 +71,13 @@ final_test_data = []
 final_test_owner = []
 for j, item in enumerate(data_tokens_train):
 	current_train_filter = [word for word in item if word in vocabulary]
-	if len(current_train_filter)>=20:  
+	if len(current_train_filter)>=5:  
 	  updated_train_data.append(current_train_filter)
 	  updated_train_owner.append(data_developer_train[j])  
 	  
 for j, item in enumerate(data_tokens_test):
 	current_test_filter = [word for word in item if word in vocabulary]  
-	if len(current_test_filter)>=20:
+	if len(current_test_filter)>=5:
 	  final_test_data.append(current_test_filter)    	  
 	  final_test_owner.append(data_developer_test[j])    	  
 
@@ -146,25 +146,25 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 
 ##############################################################  Naive Bayes #################################################
-# print "Starting Naive Bayes....."
-# classifierModel = MultinomialNB(alpha=0.01)        
-# classifierModel = OneVsRestClassifier(classifierModel).fit(train_feats, updated_train_owner)
-# predict = classifierModel.predict_proba(test_feats)
-# classes = classifierModel.classes_
-# print "classes = ",len(classes)
-# k=int(0.05*len(classes))
-# match = 0
-# for j,prob in enumerate(predict):
-# 	expected = updated_test_owner[j]
-# 	prob = [ [i,prob[i]] for i in range(len(prob))]
-# 	prob = sorted(prob, reverse = True, key = lambda x: x[1])
+print "Starting Naive Bayes....."
+classifierModel = MultinomialNB(alpha=0.01)        
+classifierModel = OneVsRestClassifier(classifierModel).fit(train_feats, updated_train_owner)
+predict = classifierModel.predict_proba(test_feats)
+classes = classifierModel.classes_
+print "classes = ",len(classes)
+k=int(0.05*len(classes))
+match = 0
+for j,prob in enumerate(predict):
+	expected = updated_test_owner[j]
+	prob = [ [i,prob[i]] for i in range(len(prob))]
+	prob = sorted(prob, reverse = True, key = lambda x: x[1])
 	
-# 	for i in range(k):
-# 		c = prob[i][0]
-# 		if classes[c]==expected:
-# 			match+=1
-# 			break
-# print "accuracy = ", float(match)/float(len(predict))*100
+	for i in range(k):
+		c = prob[i][0]
+		if classes[c]==expected:
+			match+=1
+			break
+print "accuracy = ", float(match)/float(len(predict))*100
 
 
 #############################################################  SGD Classification ###########################################
@@ -243,25 +243,25 @@ test_feats = tfidf_transformer.transform(test_counts)
 # print "accuracy = ", float(match)/float(len(predict))*100
 
 ###########################################################   AgglomerativeClustering ########################################
-print "Starting Agglomerative Clustering...."
-kmeans = AgglomerativeClustering(n_clusters=150).fit(train_feats.toarray())
-labels = kmeans.labels_
-predict = kmeans.fit_predict(train_feats.toarray(), test_feats.toarray())
-cluster_devs = {}
-for i in range(len(labels)):
-	try:
-		cluster_devs[labels[i]].append(updated_train_owner[i])
-	except:
-		cluster_devs[labels[i]] = [updated_train_owner[i]]
+# print "Starting Agglomerative Clustering...."
+# kmeans = AgglomerativeClustering(n_clusters=150).fit(train_feats.toarray())
+# labels = kmeans.labels_
+# predict = kmeans.fit_predict(train_feats.toarray(), test_feats.toarray())
+# cluster_devs = {}
+# for i in range(len(labels)):
+# 	try:
+# 		cluster_devs[labels[i]].append(updated_train_owner[i])
+# 	except:
+# 		cluster_devs[labels[i]] = [updated_train_owner[i]]
 
 
-match = 0
-print(max(labels))
-for i in range(max(labels)):
-	print len(set(cluster_devs[i]))
-for i, label in enumerate(predict):
-	expected = updated_test_owner[i]
-	if expected in cluster_devs[label]:
-		match += 1
+# match = 0
+# print(max(labels))
+# for i in range(max(labels)):
+# 	print len(set(cluster_devs[i]))
+# for i, label in enumerate(predict):
+# 	expected = updated_test_owner[i]
+# 	if expected in cluster_devs[label]:
+# 		match += 1
 
-print "accuracy = ", float(match)/float(len(predict))*100
+# print "accuracy = ", float(match)/float(len(predict))*100
