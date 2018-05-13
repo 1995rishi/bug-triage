@@ -193,19 +193,20 @@ test_feats = tfidf_transformer.transform(test_counts)
 print "Starting Meanshift Clustering...."
 bandwidth = estimate_bandwidth(train_feats.toarray(), quantile=0.2, n_samples=500)
 print "estimated bandwidth = ", bandwidth
-# ms = MeanShift(bandwidth=bandwidth)
-# ms = ms.fit(train_feats.toarray())
-# predict = ms.predict(test_feats)
-# labels = ms.labels_
-# cluster_devs = {}
-# for i in range(len(labels)):
-# 	try:
-# 		cluster_devs[labels[i]].append(updated_train_owner[i])
-# 	except:
-# 		cluster_devs[labels[i]] = [updated_train_owner[i]]
+ms = MeanShift(bandwidth=bandwidth)
+ms = ms.fit(train_feats.toarray())
+predict = ms.predict(test_feats)
+labels = ms.labels_
+cluster_devs = {}
+for i in range(len(labels)):
+	try:
+		cluster_devs[labels[i]].append(updated_train_owner[i])
+	except:
+		cluster_devs[labels[i]] = [updated_train_owner[i]]
 
-# match = 0
-# print cluster_devs
+match = 0
+for i in range(max(labels)):
+	print len(set(cluster_devs[i]))
 # for i, label in enumerate(predict):
 # 	expected = updated_test_owner[i]
 # 	if expected in cluster_devs[label]:
