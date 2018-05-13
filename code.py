@@ -39,8 +39,8 @@ with open('train.csv','r') as training_file:
 	row_count = 0
 	try:
 		for row in trainCSV:
-			# if row_count >= 5000:
-			# 	break
+			if row_count >= 5000:
+				break
 			if row_count != 0:
 				data = preprocess(row[1]) + preprocess(row[2])
 				data = filter(None, data)
