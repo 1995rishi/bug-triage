@@ -220,7 +220,7 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 #############################################################  Kmeans clustering  ############################################
 print "Starting Kmeans Clustering...."
-kmeans = KMeans(n_clusters=100, random_state=0).fit(train_feats)
+kmeans = KMeans(n_clusters=200, random_state=0).fit(train_feats)
 labels = kmeans.labels_
 predict = kmeans.predict(test_feats)
 cluster_devs = {}
