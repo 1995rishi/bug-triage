@@ -39,8 +39,8 @@ with open('train.csv','r') as training_file:
 	row_count = 0
 	try:
 		for row in trainCSV:
-			if row_count >= 5000:
-				break
+# 			if row_count >= 5000:
+# 				break
 			if row_count != 0:
 				data = preprocess(row[1]) + preprocess(row[2])
 				data = filter(None, data)
@@ -49,8 +49,6 @@ with open('train.csv','r') as training_file:
 			row_count += 1
 	except Exception as e:
 		print(e,row_count)
-
-print "hello", data_tokens[0]
 
 word2vec_model = Word2Vec(data_tokens, min_count = 5, size = 200, window = 5)
 vocabulary = word2vec_model.wv.vocab
@@ -112,7 +110,7 @@ count_vect = CountVectorizer(min_df=5, vocabulary= vocab_data,dtype=np.int32)
 
 train_counts = count_vect.fit_transform(train_data)       
 train_feats = tfidf_transformer.fit_transform(train_counts)
-# print train_feats.shape
+print train_feats.shape
 
 test_counts = count_vect.transform(test_data)
 test_feats = tfidf_transformer.transform(test_counts)
