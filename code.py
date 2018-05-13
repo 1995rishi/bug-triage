@@ -10,7 +10,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import SGDClassifier
 from nltk.corpus import stopwords
 
-from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.cluster import MeanShift, estimate_bandwidth, DBSCAN
 
 #import tensorflow as tf
 
@@ -205,13 +205,17 @@ for i in range(len(labels)):
 		cluster_devs[labels[i]] = [updated_train_owner[i]]
 
 match = 0
+print(max(labels))
 for i in range(max(labels)):
 	print len(set(cluster_devs[i]))
-# for i, label in enumerate(predict):
-# 	expected = updated_test_owner[i]
-# 	if expected in cluster_devs[label]:
-# 		match += 1
+for i, label in enumerate(predict):
+	expected = updated_test_owner[i]
+	if expected in cluster_devs[label]:
+		match += 1
 
-# print "accuracy = ", float(match)/float(len(predict))*100
-# cluster_centers = ms.cluster_centers_
-# print len(cluster_centers)
+print "accuracy = ", float(match)/float(len(predict))*100
+cluster_centers = ms.cluster_centers_
+print len(cluster_centers)
+
+
+#############################################################  Dbscan clustering  ############################################
