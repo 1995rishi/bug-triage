@@ -48,8 +48,8 @@ with open('train.csv','r') as training_file:
 				data_tokens.append(data)
 				data_developer.append(row[0])
 			row_count += 1
-	except:
-		print(row_count)
+	except Exception as e:
+		print(e,row_count)
 
 print "hello", data_tokens[0]
 
