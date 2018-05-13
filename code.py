@@ -10,7 +10,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import SGDClassifier
 from nltk.corpus import stopwords
 
-from sklearn.cluster import MeanShift, estimate_bandwidth, DBSCAN, KMeans
+from sklearn.cluster import MeanShift, estimate_bandwidth, DBSCAN, KMeans, AgglomerativeClustering
 
 #import tensorflow as tf
 
@@ -219,10 +219,34 @@ test_feats = tfidf_transformer.transform(test_counts)
 
 
 #############################################################  Kmeans clustering  ############################################
-print "Starting Kmeans Clustering...."
-kmeans = KMeans(n_clusters=100, random_state=0).fit(train_feats)
+# print "Starting Kmeans Clustering...."
+# kmeans = KMeans(n_clusters=200, random_state=0).fit(train_feats)
+# labels = kmeans.labels_
+# predict = kmeans.predict(test_feats)
+# cluster_devs = {}
+# for i in range(len(labels)):
+# 	try:
+# 		cluster_devs[labels[i]].append(updated_train_owner[i])
+# 	except:
+# 		cluster_devs[labels[i]] = [updated_train_owner[i]]
+
+
+# match = 0
+# print(max(labels))
+# for i in range(max(labels)):
+# 	print len(set(cluster_devs[i]))
+# for i, label in enumerate(predict):
+# 	expected = updated_test_owner[i]
+# 	if expected in cluster_devs[label]:
+# 		match += 1
+
+# print "accuracy = ", float(match)/float(len(predict))*100
+
+###########################################################   AgglomerativeClustering ########################################
+print "Starting Agglomerative Clustering...."
+kmeans = AgglomerativeClustering(n_clusters=150).fit(train_feats)
 labels = kmeans.labels_
-predict = kmeans.predict(test_feats)
+predict = kmeans.fit_predict(train_feats, test_feats)
 cluster_devs = {}
 for i in range(len(labels)):
 	try:
@@ -241,3 +265,4 @@ for i, label in enumerate(predict):
 		match += 1
 
 print "accuracy = ", float(match)/float(len(predict))*100
+
